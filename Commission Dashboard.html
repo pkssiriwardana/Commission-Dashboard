@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stockbroking Commission Dashboard — 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg1:#f8fafc; --bg2:#e2e8f0; --bg3:#cbd5e1;
+      --text:#0f172a; --muted:#334155;
+      --card1: linear-gradient(135deg, rgba(255,255,255,.9), rgba(248,250,252,.85));
+      --card2: linear-gradient(135deg, rgba(240,249,255,.9), rgba(219,234,254,.85));
+      --accent:#1d4ed8; --skyBlue:#3b82f6; --deepSkyBlue:#1e3a8a;
+      --brokerBg: linear-gradient(135deg, rgba(96,165,250,.15), rgba(147,197,253,.1));
+      --commissionBg: linear-gradient(135deg, rgba(16,185,129,.15), rgba(52,211,153,.1));
+      --salaryBg: linear-gradient(135deg, rgba(139,69,219,.25), rgba(168,85,247,.20));
+      --glow: 0 2px 8px rgba(59,130,246,.1);
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    body{
+      font-family: Inter, -apple-system, system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text); line-height: 1.4; font-size: 14px; font-weight: 500;
+      -webkit-text-size-adjust: 100%;
+    }
+    .container{
+      max-width: 1200px; margin: 0 auto; padding: 12px;
+    }
+    
+    /* Compact Header */
+    .header{
+      text-align: center; margin-bottom: 16px;
+      background: var(--card1); border-radius: 12px; padding: 12px;
+      box-shadow: var(--glow);
+    }
+    .title{
+      font-size: 20px; color: var(--deepSkyBlue); font-weight: 700; margin-bottom: 8px;
+    }
+    
+    /* Input Section - Horizontal Layout */
+    .input-grid{
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
+    }
+    .input-group{
+      background: var(--card2); border-radius: 10px; padding: 12px;
+      border: 2px solid rgba(59,130,246,.2); box-shadow: var(--glow);
+    }
+    .input-group label{
+      display: block; font-size: 12px; font-weight: 600; color: var(--text);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .input-group input{
+      width: 100%; padding: 8px 10px; border: 2px solid rgba(59,130,246,.25);
+      border-radius: 6px; font-size: 16px; background: #fff;
+      color: var(--text); outline: none; font-weight: 500;
+      min-height: 40px;
+    }
+    /* iPhone-specific select styling */
+    .input-group select{
+      width: 100%; padding: 8px 10px; border: 2px solid rgba(59,130,246,.25);
+      border-radius: 6px; font-size: 16px; background: #fff;
+      color: var(--text); outline: none; font-weight: 500;
+      min-height: 40px;
+      -webkit-appearance: menulist-button !important;
+      -moz-appearance: menulist-button !important;
+      appearance: menulist-button !important;
+    }
+    .input-group input:focus, .input-group select:focus{
+      border-color: var(--accent); box-shadow: 0 0 0 2px rgba(29,78,216,.15);
+    }
+    
+    /* Reduce Tabs - Compact */
+    .tabs-section{
+      margin-bottom: 12px; text-align: center;
+    }
+    .tabs-info{
+      font-size: 11px; color: var(--text); margin-bottom: 6px; font-weight: 500;
+    }
+    .tabs{
+      display: inline-flex; gap: 4px; background: rgba(59,130,246,.1);
+      padding: 4px; border-radius: 8px;
+    }
+    .tab{
+      padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      background: transparent; color: var(--text); cursor: pointer;
+      transition: all 0.2s; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.active{
+      background: var(--accent); color: white;
+    }
+    
+    /* Results Grid - 3 columns */
+    .results-grid{
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
+    }
+    .result-card{
+      background: var(--card1); border-radius: 12px; padding: 14px;
+      border: 2px solid rgba(59,130,246,.2); box-shadow: var(--glow);
+      text-align: center;
+    }
+    .result-card:first-child{
+      background: var(--brokerBg); border-color: rgba(96,165,250,.3);
+    }
+    .result-card:last-child{
+      background: var(--commissionBg); border-color: rgba(16,185,129,.3);
+    }
+    .result-title{
+      font-size: 12px; color: var(--text); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .result-value{
+      font-size: 16px; font-weight: 700; color: var(--text);
+      word-break: break-word;
+    }
+    
+    /* Salary Calculator Section */
+    .salary-section{
+      background: var(--salaryBg); border: 2px solid rgba(139,69,219,.3);
+      border-radius: 12px; padding: 16px; margin-bottom: 16px;
+      box-shadow: var(--glow);
+    }
+    .salary-title{
+      font-size: 16px; color: var(--text); font-weight: 700; text-align: center;
+      margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    
+    .salary-grid{
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px; margin-bottom: 16px;
+    }
+    .salary-item{
+      background: rgba(255,255,255,.8); border-radius: 8px; padding: 10px;
+      border: 1px solid rgba(139,69,219,.25); position: relative;
+    }
+    .salary-item label{
+      font-size: 11px; color: var(--text); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block;
+    }
+    .salary-item input{
+      width: 100%; padding: 6px 8px; border: 1px solid rgba(139,69,219,.35);
+      border-radius: 5px; font-size: 16px; font-weight: 500;
+      background: #fff; min-height: 32px;
+    }
+    .salary-item .display{
+      background: rgba(139,69,219,.12); padding: 6px 8px; border-radius: 5px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+    }
+    .percent-symbol{
+      position: absolute; right: 16px; top: 32px; color: #64748b;
+      font-weight: 500; font-size: 13px; pointer-events: none;
+    }
+    
+    /* Extended row with allowance, deduction, tax and net salary */
+    .extended-row{
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-top: 16px;
+      align-items: end;
+    }
+    .net-salary{
+      background: linear-gradient(135deg, rgba(16,185,129,.2), rgba(52,211,153,.15));
+      border: 2px solid rgba(16,185,129,.3); border-radius: 8px; padding: 10px;
+      text-align: center;
+    }
+    .net-salary .label{
+      font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .net-salary .value{
+      font-size: 16px; font-weight: 700; color: #059669;
+    }
+    
+    /* Disclaimer */
+    .disclaimer{
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
+      font-size: 11px; color: #991b1b; text-align: center; font-weight: 500;
+    }
+    
+    /* Empty Footer */
+    .footer{
+      background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(147,197,253,.05));
+      border-radius: 10px; padding: 10px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; height: 20px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .input-grid{ grid-template-columns: 1fr 1fr; }
+      .results-grid{ grid-template-columns: 1fr; }
+      .salary-grid{ grid-template-columns: 1fr; }
+      .extended-row{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="title">Stockbroking Commission Dashboard — 2025</div>
+    </div>
+
+    <!-- Input Grid -->
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="brokerSelect">Broker Firms</label>
+        <select id="brokerSelect">
+          <option value="0">Asia Securities Pvt Ltd.</option>
+          <option value="1" selected>Asha Securities Pvt Ltd.</option>
+          <option value="2">Capita Trust Securities Pvt Ltd.</option>
+          <option value="3">Capital Alliance Securities Pvt Ltd.</option>
+          <option value="4">First Capital Equities Pvt Ltd.</option>
+          <option value="5">LOLC Securities Ltd.</option>
+          <option value="6">S C Securities Pvt Ltd.</option>
+          <option value="7">Softlogic Stockbrokers Pvt Ltd.</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="monthlyCost">Monthly Salary + Cost (Rs)</label>
+        <input id="monthlyCost" type="text" placeholder="100,000" />
+      </div>
+      <div class="input-group">
+        <label for="turnover">Total Brokerage Turnover (Rs)</label>
+        <input id="turnover" type="text" placeholder="1,000,000" />
+      </div>
+      <div class="input-group">
+        <label for="backOffice">Back Office Commission (%)</label>
+        <input id="backOffice" type="text" placeholder="0.0" />
+      </div>
+    </div>
+
+    <!-- Reduce Tabs -->
+    <div class="tabs-section" id="tabsSection">
+      <div class="tabs-info">Reduce Monthly Salary:</div>
+      <div class="tabs" id="reduceTabs">
+        <div class="tab active" data-reduce="0">0x</div>
+        <div class="tab" data-reduce="1">1x</div>
+        <div class="tab" data-reduce="2">2x</div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-title">Selected Broker Firm</div>
+        <div class="result-value" id="kBroker">-</div>
+      </div>
+      <div class="result-card">
+        <div class="result-title">Commission Percentage</div>
+        <div class="result-value" id="kRate">-</div>
+      </div>
+      <div class="result-card">
+        <div class="result-title">Commission Earned (Rs)</div>
+        <div class="result-value" id="kTotal">-</div>
+      </div>
+    </div>
+
+    <!-- Salary Calculator Section -->
+    <div class="salary-section">
+      <div class="salary-title">Monthly Salary Calculator</div>
+      
+      <div class="salary-grid">
+        <div class="salary-item">
+          <label for="grossSalary">Monthly Salary (Rs)</label>
+          <input id="grossSalary" type="text" placeholder="Enter salary" />
+        </div>
+        <div class="salary-item">
+          <label>EPF Deduction (8%)</label>
+          <div class="display" id="epfDeduction">Rs 0</div>
+        </div>
+        <!-- ETF Deduction removed as requested -->
+        <div class="salary-item">
+          <label>After EPF</label>
+          <div class="display" id="afterDeductions">Rs 0</div>
+        </div>
+        <div class="salary-item">
+          <label>Commission Earned</label>
+          <div class="display" id="commissionDisplay">Rs 0</div>
+        </div>
+      </div>
+      
+      <!-- Extended row: Allowance, Deduction, Tax and Net Salary -->
+      <div class="extended-row">
+        <div class="salary-item">
+          <label for="additionalAllowance">Additional Allowance (Rs)</label>
+          <input id="additionalAllowance" type="text" placeholder="Allowance amount" />
+        </div>
+        <div class="salary-item">
+          <label for="additionalDeduction">Additional Deduction (Rs)</label>
+          <input id="additionalDeduction" type="text" placeholder="Deduction amount" />
+        </div>
+        <div class="salary-item">
+          <label for="taxDeduction">Tax Deduction (%)</label>
+          <input id="taxDeduction" type="number" min="0" max="100" step="0.01" placeholder="Enter Tax %" />
+          <span class="percent-symbol" id="percentSymbol" style="display:none;">%</span>
+        </div>
+        <div class="net-salary">
+          <div class="label">Net Salary</div>
+          <div class="value" id="netSalaryValue">Rs 0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> Calculations are for reference only. No liability is accepted for any errors or omissions.
+    </div>
+
+    <!-- Empty Footer -->
+    <div class="footer"></div>
+  </div>
+
+  <script>
+    const brokers = [
+      { name: "Asia Securities Pvt Ltd.", tiers:[{op:">=",x:2,rate:20},{op:">=",x:4,rate:25}] },
+      { name: "Asha Securities Pvt Ltd.", tiers:[{op:"range",min:2,max:7,rate:20},{op:">",x:7,rate:25}] },
+      { name: "Capita Trust Securities Pvt Ltd.", tiers:[{op:">=",x:2,rate:20}] },
+      { name: "Capital Alliance Securities Pvt Ltd.", tiers:[{op:">=",x:2,rate:20},{op:">=",x:4,rate:25},{op:">=",x:6,rate:30}] },
+      { name: "First Capital Equities Pvt Ltd.", tiers:[{op:">=",x:2,rate:20},{op:">=",x:3,rate:25},{op:">=",x:4,rate:30}] },
+      { name: "LOLC Securities Ltd.", tiers:[{op:">=",x:2,rate:15},{op:">=",x:4,rate:20},{op:">=",x:10,rate:40}] },
+      { name: "S C Securities Pvt Ltd.", tiers:[{op:">=",x:3,rate:10},{op:">=",x:6,rate:20},{op:">=",x:10,rate:30}] },
+      { name: "Softlogic Stockbrokers Pvt Ltd.", tiers:[{op:">=",x:1.15,rate:20},{op:">",x:11,rate:50}] }
+    ];
+
+    const brokerSelect = document.getElementById('brokerSelect');
+    const monthlyCostInput = document.getElementById('monthlyCost');
+    const turnoverInput = document.getElementById('turnover');
+    const backOfficeInput = document.getElementById('backOffice');
+    const kBroker = document.getElementById('kBroker');
+    const kRate = document.getElementById('kRate');
+    const kTotal = document.getElementById('kTotal');
+    const reduceTabs = document.getElementById('reduceTabs');
+    const tabsSection = document.getElementById('tabsSection');
+
+    // Salary calculator elements
+    const grossSalaryInput = document.getElementById('grossSalary');
+    const epfDeductionDisplay = document.getElementById('epfDeduction');
+    const afterDeductionsDisplay = document.getElementById('afterDeductions');
+    const commissionDisplay = document.getElementById('commissionDisplay');
+    const additionalAllowanceInput = document.getElementById('additionalAllowance');
+    const additionalDeductionInput = document.getElementById('additionalDeduction');
+    const taxDeductionInput = document.getElementById('taxDeduction');
+    const netSalaryValue = document.getElementById('netSalaryValue');
+    const percentSymbol = document.getElementById('percentSymbol');
+
+    let reduceFactor = 0;
+    let currentCommissionEarned = 0;
+
+    // Show/hide percentage symbol
+    taxDeductionInput.addEventListener('input', function() {
+      if(this.value.trim() !== '') {
+        percentSymbol.style.display = 'block';
+      } else {
+        percentSymbol.style.display = 'none';
+      }
+    });
+
+    function opMatch(t, val){
+      if(t.op === ">=") return val >= t.x;
+      if(t.op === ">") return val > t.x;
+      if(t.op === "range") return val >= t.min && val <= t.max;
+      return false;
+    }
+
+    function computeRate(b, multiplier){
+      if(b.name === "Asha Securities Pvt Ltd.") {
+        if(multiplier > 7) return { rate: 25, reason: ">7x" };
+        if(multiplier >= 2 && multiplier <= 7) return { rate: 20, reason: "2x–7x" };
+        return { rate: 0, reason: "Below minimum" };
+      }
+      
+      if(b.name === "LOLC Securities Ltd.") {
+        const effectiveRate = multiplier >= 10 ? 
+          (2 * 15 + 6 * 20 + (multiplier - 10) * 40) / multiplier :
+          multiplier >= 4 ?
+          (2 * 15 + (multiplier - 4) * 20) / multiplier :
+          multiplier >= 2 ? 15 : 0;
+          
+        return { 
+          rate: Math.round(effectiveRate * 100) / 100, 
+          reason: multiplier >= 10 ? "≥10x" : multiplier >= 4 ? "≥4x" : multiplier >= 2 ? "≥2x" : "Below minimum"
+        };
+      }
+      
+      // Special handling for Softlogic Stockbrokers
+      if(b.name === "Softlogic Stockbrokers Pvt Ltd.") {
+        if(multiplier > 11) return { rate: 50, reason: ">11x" };
+        if(multiplier >= 1.15) return { rate: 20, reason: "≥1.15x" };
+        return { rate: 0, reason: "Below minimum" };
+      }
+      
+      let best = null;
+      for(const t of b.tiers){
+        if(opMatch(t, multiplier)){
+          if(!best || t.rate > best.rate) best = { rate: t.rate, reason: `≥${t.x}x` };
+        }
+      }
+      return best ? best : { rate: 0, reason: "Below minimum" };
+    }
+    
+    function calculateCommissionEarned(b, multiplier, baseAmount) {
+      if(b.name === "LOLC Securities Ltd." && multiplier >= 2) {
+        let commission = 0;
+        
+        if(multiplier >= 2) {
+          const range1 = Math.min(multiplier, 4) - 2;
+          const portion1 = (range1 / multiplier) * baseAmount;
+          commission += portion1 * 0.15;
+        }
+        
+        if(multiplier >= 4) {
+          const range2 = Math.min(multiplier, 10) - 4;
+          const portion2 = (range2 / multiplier) * baseAmount;
+          commission += portion2 * 0.20;
+        }
+        
+        if(multiplier >= 10) {
+          const range3 = multiplier - 10;
+          const portion3 = (range3 / multiplier) * baseAmount;
+          commission += portion3 * 0.40;
+        }
+        
+        return commission;
+      }
+      
+      const res = computeRate(b, multiplier);
+      return baseAmount * (res.rate / 100);
+    }
+    
+    function fmtMoney(n){ 
+      return new Intl.NumberFormat('en-US', {
+        style:'currency', 
+        currency:'LKR',
+        minimumFractionDigits:0,
+        maximumFractionDigits:0
+      }).format(n).replace('LKR', 'Rs');
+    }
+    
+    function parseNumber(str) {
+      return parseFloat(str.replace(/[,\s]/g, '') || "0");
+    }
+    
+    function formatNumber(num, decimals = 0) {
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(num);
+    }
+
+    function updateSalaryCalculator() {
+      const grossSalary = parseNumber(grossSalaryInput.value);
+      const allowance = parseNumber(additionalAllowanceInput.value);
+      const deduction = parseNumber(additionalDeductionInput.value);
+      const taxPercent = parseNumber(taxDeductionInput.value);
+      
+      // EPF deduction (8% of gross salary) - ETF removed
+      const epfDeduction = grossSalary * 0.08;
+      epfDeductionDisplay.textContent = `Rs ${formatNumber(epfDeduction)}`;
+      
+      // After EPF deductions (no ETF)
+      const afterDeductions = grossSalary - epfDeduction;
+      afterDeductionsDisplay.textContent = `Rs ${formatNumber(afterDeductions)}`;
+      
+      // Commission earned (from main calculation)
+      commissionDisplay.textContent = `Rs ${formatNumber(currentCommissionEarned)}`;
+      
+      // Net salary calculation (Tax as percentage, includes additional deduction)
+      const totalBeforeTax = afterDeductions + currentCommissionEarned + allowance - deduction;
+      const netSalary = totalBeforeTax * (1 - taxPercent / 100);
+      netSalaryValue.textContent = `Rs ${formatNumber(netSalary)}`;
+    }
+
+    function handleBrokerChange() {
+      const selectedIndex = parseInt(brokerSelect.value, 10);
+      const selectedBroker = brokers[selectedIndex];
+      const isLOLC = selectedBroker.name === "LOLC Securities Ltd.";
+      
+      if(isLOLC) {
+        tabsSection.style.display = 'none';
+        reduceFactor = 0;
+      } else {
+        tabsSection.style.display = 'block';
+      }
+      
+      render();
+    }
+
+    function init(){
+      monthlyCostInput.value = "100,000";
+      turnoverInput.value = "1,000,000";
+      backOfficeInput.value = "0.0";
+      grossSalaryInput.value = "150,000";
+      additionalAllowanceInput.value = "0";
+      additionalDeductionInput.value = "0";
+      taxDeductionInput.value = "0";
+      
+      brokerSelect.addEventListener('change', handleBrokerChange);
+      handleBrokerChange();
+      
+      // Tab events
+      document.querySelectorAll('.tab').forEach(tab=>{
+        tab.addEventListener('click', ()=>{
+          document.querySelectorAll('.tab').forEach(t=> t.classList.remove('active'));
+          tab.classList.add('active');
+          reduceFactor = parseInt(tab.getAttribute('data-reduce'),10);
+          render();
+        });
+      });
+      
+      render();
+      updateSalaryCalculator();
+    }
+
+    function render(){
+      const monthlyCost = parseNumber(monthlyCostInput.value);
+      const turnover = parseNumber(turnoverInput.value);
+      const backOfficePct = Math.max(0, parseNumber(backOfficeInput.value));
+
+      const multiplier = monthlyCost > 0 ? (turnover / monthlyCost) : 0;
+
+      // Selected broker
+      const selected = brokers[parseInt(brokerSelect.value,10)];
+      const selRes = computeRate(selected, multiplier);
+      
+      const isLOLC = selected.name === "LOLC Securities Ltd.";
+      const baseSelected = isLOLC ? turnover : Math.max(0, turnover - (reduceFactor * monthlyCost));
+      const earnedSelected = calculateCommissionEarned(selected, multiplier, baseSelected);
+      const netSelected = earnedSelected - (earnedSelected * (backOfficePct/100));
+
+      kBroker.textContent = selected.name;
+      kRate.textContent = `${selRes.rate}%`;
+      if(backOfficePct > 0){
+        kTotal.innerHTML = `${fmtMoney(earnedSelected)}<br><small style="color:#059669; font-weight:600">(Net: ${fmtMoney(netSelected)})</small>`;
+        currentCommissionEarned = netSelected;
+      } else {
+        kTotal.textContent = fmtMoney(earnedSelected);
+        currentCommissionEarned = earnedSelected;
+      }
+      
+      updateSalaryCalculator();
+    }
+
+    // Input events
+    [monthlyCostInput, turnoverInput, backOfficeInput].forEach(input => {
+      input.addEventListener('input', () => setTimeout(render, 200));
+      input.addEventListener('blur', () => {
+        const num = parseNumber(input.value);
+        const decimals = input === backOfficeInput ? 1 : 0;
+        input.value = formatNumber(num, decimals);
+        render();
+      });
+    });
+
+    // Salary calculator input events
+    [grossSalaryInput, additionalAllowanceInput, additionalDeductionInput, taxDeductionInput].forEach(input => {
+      input.addEventListener('input', () => setTimeout(updateSalaryCalculator, 200));
+      input.addEventListener('blur', () => {
+        const num = parseNumber(input.value);
+        const decimals = input === taxDeductionInput ? 2 : 0;
+        input.value = formatNumber(num, decimals);
+        updateSalaryCalculator();
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>
